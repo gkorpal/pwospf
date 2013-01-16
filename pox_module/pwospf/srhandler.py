@@ -63,7 +63,8 @@ class SRServerListener(EventMixin):
 
   def send_to_vhost(self, message, vhost):
     log.debug('Unicast message to %s: %s', vhost, message)
-    self.srclients[vhost].send(message)
+    vhost_conn = self.srclients[vhost]
+    vhost_conn.send(message)
 
   def _handle_SRPacketIn(self, event):
     log.debug("SRServerListener catch SRPacketIn event, port=%d, pkt=%r, vhost=%s" % (event.port, event.pkt, event.vhost))
@@ -77,10 +78,12 @@ class SRServerListener(EventMixin):
 
   def _handle_RouterInfo(self, event):
     log.debug("SRServerListener catch RouterInfo even for vhost=%s, info=%s, rtable=%s", event.vhost, event.info, event.rtable)
-    sw_info = event.info[event.vhost]
+    sw_info = event.info
     interfaces = []
+    log.debug("%s interface list:" % event.vhost)
     for intf in sw_info.keys():
       ip, mac, rate, port = sw_info[intf]
+      log.debug("%s: %s %s %s %s" % (intf, ip, mac, rate, port))
       ip = pack_ip(ip)
       mac = pack_mac(mac)
       mask = pack_ip('255.255.255.255')
@@ -138,8 +141,8 @@ class SRServerListener(EventMixin):
   def _handle_open_msg(self, conn, vns_msg):
     # client wants to connect to some topology.
     log.debug("open-msg: %s, vhost:%s" % (vns_msg.topo_id, vns_msg.vhost))
-    self.srclients[vns_msg.vhost] = conn
-    self.srclients_reverse[conn] = vns_msg.vhost
+    self.srclients['%s' % vns_msg.vhost] = conn
+    self.srclients_reverse[conn] = '%s' % vns_msg.vhost
     try:
       conn.send(VNSHardwareInfo(self.interfaces[vns_msg.vhost]))
     except:
@@ -165,7 +168,8 @@ class SRServerListener(EventMixin):
     #log.debug("packet-out %s: " % ethernet(raw=pkt))
     log.debug('SRServerHandler raise packet out event')
     core.cs144_srhandler.raiseEvent(SRPacketOut(pkt, out_port, vhost))
-
+  def _handle_open_template_msg(conn, vns_msg): 
+    self._handle_open_msg(conn, vns_msg)
 class SRPacketOut(Event):
   '''Event to raise upon receiving a packet back from SR'''
 

@@ -44,7 +44,7 @@ log = core.getLogger()
 FLOOD_DELAY = 5
 IPCONFIG_FILE = '/home/ubuntu/pwospf/IP_CONFIG'
 IP_SETTING={}
-RTABLE = []
+RTABLE = {}
 VHOST_RTABLE = {}
 VHOST_HW = {}
 
@@ -76,15 +76,17 @@ class OFHandler (EventMixin):
         else:
           self.vhost_id = intf_name[0] #get the first part of vhost1-eth0 
           intf_name = intf_name[1]
-        if self.vhost_id not in VHOST_HW[self.vhost_id].keys():
+        if self.vhost_id not in self.sw_info.keys():
           self.sw_info[self.vhost_id] = {}
-        if intf_name in VHOST_HW[self.vhost_id].keys():
-          self.sw_info[self.vhost_id][intf_name] = (VHOST_HW[self.vhost_id][intf_name], port.hw_addr.toStr(), '10Gbps', port.port_no)
+        #if intf_name in VHOST_HW[self.vhost_id].keys():
+        self.sw_info[self.vhost_id][intf_name] = (VHOST_HW[self.vhost_id][intf_name], port.hw_addr.toStr(), '10Gbps', port.port_no)
+        print self.sw_info
+        
     self.rtable = RTABLE
     # We want to hear Openflow PacketIn messages, so we listen
     self.listenTo(connection)
     self.listenTo(core.cs144_srhandler)
-    core.cs144_ofhandler.raiseEvent(RouterInfo(self.sw_info, self.rtable, self.vhost_id))
+    core.cs144_ofhandler.raiseEvent(RouterInfo(self.sw_info[self.vhost_id], self.rtable[self.vhost_id], self.vhost_id))
 
   def _handle_PacketIn (self, event):
     """
@@ -155,6 +157,22 @@ def get_ip_setting():
       ROUTER_IP['eth2'] = '%s' % IP_SETTING['vhost%d-eth2'% h ]
       ROUTER_IP['eth3'] = '%s' % IP_SETTING['vhost%d-eth3'% h ]
       VHOST_HW['vhost%d' % h] = ROUTER_IP
+
+  for h in [1,2,3]:
+      RTABLE['vhost%d' % h] = []
+      if h == 1:
+        RTABLE['vhost%d' % h].append( ('%s' % IP_SETTING['client'], '%s' % IP_SETTING['client'], '255.255.255.255', 'eth1') )
+        RTABLE['vhost%d' % h].append( ('192.168.2.0', '%s' % VHOST_HW['vhost2']['eth1'], '255.255.0.0', 'eth2') )
+        RTABLE['vhost%d' % h].append( ('172.24.3.0', '%s' % VHOST_HW['vhost3']['eth1'], '255.255.0.0', 'eth3') )
+      elif h == 2:
+        RTABLE['vhost%d' % h].append( ('10.0.1.0', '%s' % VHOST_HW['vhost1']['eth2'], '255.255.0.0', 'eth1') )
+        RTABLE['vhost%d' % h].append( ('%s' % IP_SETTING['server1'], '%s' % IP_SETTING['server1'], '255.255.255.255', 'eth2') )
+        RTABLE['vhost%d' % h].append( ('172.24.3.0', '%s' % VHOST_HW['vhost3']['eth3'], '255.255.0.0', 'eth3') )
+      elif h == 3:
+        RTABLE['vhost%d' % h].append( ('10.0.1.0', '%s' % VHOST_HW['vhost1']['eth2'], '255.255.0.0', 'eth1') )
+        RTABLE['vhost%d' % h].append( ('%s' % IP_SETTING['server2'], '%s' % IP_SETTING['server2'], '255.255.255.255', 'eth2') )
+        RTABLE['vhost%d' % h].append( ('192.168.2.0', '%s' % VHOST_HW['vhost2']['eth3'], '255.255.0.0', 'eth3') )
+
   return 0
 
 
