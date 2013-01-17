@@ -46,9 +46,11 @@ class SRServerListener(EventMixin):
     port = address[1]
     self.listenTo(core.cs144_ofhandler)
     self.srclients = {}
+    self.srclients_reverse = {}
     self.listen_port = port
     self.intfname_to_port = {}
     self.port_to_intfname = {}
+    self.interfaces = {}
     self.server = create_vns_server(port,
                                     self._handle_recv_msg,
                                     self._handle_new_client,
@@ -80,13 +82,11 @@ class SRServerListener(EventMixin):
     log.debug("SRServerListener catch RouterInfo even for vhost=%s, info=%s, rtable=%s", event.vhost, event.info, event.rtable)
     sw_info = event.info
     interfaces = []
-    log.debug("%s interface list:" % event.vhost)
     for intf in sw_info.keys():
       ip, mac, rate, port = sw_info[intf]
-      log.debug("%s: %s %s %s %s" % (intf, ip, mac, rate, port))
       ip = pack_ip(ip)
       mac = pack_mac(mac)
-      mask = pack_ip('255.255.255.255')
+      mask = pack_ip('255.255.255.0')
       interfaces.append(VNSInterface(intf, mac, ip, mask))
       # Mapping between of-port and intf-name
       if( event.vhost not in self.intfname_to_port.keys()):
@@ -95,8 +95,8 @@ class SRServerListener(EventMixin):
       self.intfname_to_port[event.vhost][intf] = port
       self.port_to_intfname[event.vhost][port] = intf
     # store the list of interfaces...
-    self.interfaces = {}
     self.interfaces[event.vhost] = interfaces
+    
 
   def _handle_recv_msg(self, conn, vns_msg):
     # demux sr-client messages and take approriate actions
@@ -143,8 +143,10 @@ class SRServerListener(EventMixin):
     log.debug("open-msg: %s, vhost:%s" % (vns_msg.topo_id, vns_msg.vhost))
     self.srclients['%s' % vns_msg.vhost] = conn
     self.srclients_reverse[conn] = '%s' % vns_msg.vhost
+    
+    print self.interfaces['%s' % vns_msg.vhost]
     try:
-      conn.send(VNSHardwareInfo(self.interfaces[vns_msg.vhost]))
+      conn.send(VNSHardwareInfo(self.interfaces['%s' % vns_msg.vhost]))
     except:
       log.debug('interfaces not populated yet')  
     return

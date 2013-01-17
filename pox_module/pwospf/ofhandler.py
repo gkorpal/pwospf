@@ -162,16 +162,16 @@ def get_ip_setting():
       RTABLE['vhost%d' % h] = []
       if h == 1:
         RTABLE['vhost%d' % h].append( ('%s' % IP_SETTING['client'], '%s' % IP_SETTING['client'], '255.255.255.255', 'eth1') )
-        RTABLE['vhost%d' % h].append( ('192.168.2.0', '%s' % VHOST_HW['vhost2']['eth1'], '255.255.0.0', 'eth2') )
-        RTABLE['vhost%d' % h].append( ('172.24.3.0', '%s' % VHOST_HW['vhost3']['eth1'], '255.255.0.0', 'eth3') )
+        RTABLE['vhost%d' % h].append( ('10.0.2.0', '%s' % VHOST_HW['vhost2']['eth1'], '255.255.255.0', 'eth2') )
+        RTABLE['vhost%d' % h].append( ('10.0.3.0', '%s' % VHOST_HW['vhost3']['eth1'], '255.255.255.0', 'eth3') )
       elif h == 2:
-        RTABLE['vhost%d' % h].append( ('10.0.1.0', '%s' % VHOST_HW['vhost1']['eth2'], '255.255.0.0', 'eth1') )
+        RTABLE['vhost%d' % h].append( ('10.0.2.0', '%s' % VHOST_HW['vhost1']['eth2'], '255.255.255.0', 'eth1') )
         RTABLE['vhost%d' % h].append( ('%s' % IP_SETTING['server1'], '%s' % IP_SETTING['server1'], '255.255.255.255', 'eth2') )
-        RTABLE['vhost%d' % h].append( ('172.24.3.0', '%s' % VHOST_HW['vhost3']['eth3'], '255.255.0.0', 'eth3') )
+        RTABLE['vhost%d' % h].append( ('192.168.3.0', '%s' % VHOST_HW['vhost3']['eth3'], '255.255.255.0', 'eth3') )
       elif h == 3:
-        RTABLE['vhost%d' % h].append( ('10.0.1.0', '%s' % VHOST_HW['vhost1']['eth2'], '255.255.0.0', 'eth1') )
+        RTABLE['vhost%d' % h].append( ('10.0.3.0', '%s' % VHOST_HW['vhost1']['eth3'], '255.255.255.0', 'eth1') )
         RTABLE['vhost%d' % h].append( ('%s' % IP_SETTING['server2'], '%s' % IP_SETTING['server2'], '255.255.255.255', 'eth2') )
-        RTABLE['vhost%d' % h].append( ('192.168.2.0', '%s' % VHOST_HW['vhost2']['eth3'], '255.255.0.0', 'eth3') )
+        RTABLE['vhost%d' % h].append( ('192.168.3.0', '%s' % VHOST_HW['vhost2']['eth3'], '255.255.255.0', 'eth3') )
 
   return 0
 
