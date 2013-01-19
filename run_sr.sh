@@ -1,5 +1,5 @@
 #!/bin/sh
-if [ $# -ne 1 ]; then
+if [ $# -ne 2 ]; then
     echo "Usage: $0 mininet_machine_ip vhost_num"
     exit
 fi
