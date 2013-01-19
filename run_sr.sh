@@ -5,4 +5,4 @@ if [ $# -ne 1 ]; then
 fi
 
 #TODO: change the hostname into the ip/hostname of the machine runs mininet/pox
-./sr_solution -t 300 -v vhost$2 -r rtable.vhost$2 -s $1 -p 8888 -l vhost$2.pcap
+./sr_solution -t 300 -v $2 -r rtable.$2 -s $1 -p 8888 -l $2.pcap
