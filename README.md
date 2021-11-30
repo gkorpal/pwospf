@@ -114,7 +114,7 @@ Nothing to do, will sleep until next event in 1s, 0ns
 
 ## Dealing With Routes
 
-The [[Simple Router]] project does not really require sophisticated handling of routes. However, when implementing pwospf, special care must be taken to ensure that routes are treated correctly by your router. Before starting pwospf development, we suggest that you first ensure your router properly handles default routes, gateways and subnets.
+When implementing pwospf, special care must be taken to ensure that routes are treated correctly by your router. Before starting pwospf development, we suggest that you first ensure your router properly handles default routes, gateways and subnets.
 
 ### Next Hop
 The routing table consists of 3 fields; destination prefix, next-hop, network mask and the outgoing interface. The next-hop specifies the IP address of the next hop router towards the destination. What if the destination is directly connected to one of the router’s interfaces? In this case, the next-hop value is 0 (0.0.0.0) serving as an indication to the router that the packets destination address is directly connected to outgoing interface specified by the route. If your router receives a packet to destination 1.2.3.4 and your router has a route:
